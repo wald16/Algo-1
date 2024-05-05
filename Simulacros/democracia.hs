@@ -29,7 +29,7 @@ posicion elem ((x, y):xs) | elem == x = 1
 
 posicionNum :: Integer -> [Integer] -> Integer
 posicionNum n (x:xs) | n == x = 1
-                    | otherwise = 1 + posicionNum n xs
+                     | otherwise = 1 + posicionNum n xs
 
 posANum :: Integer -> [Integer] -> Integer
 posANum 1 (x:xs) = x * 100
