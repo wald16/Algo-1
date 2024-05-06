@@ -160,7 +160,7 @@ todosN 1 = 1
 todosN x = x + todosN(x-1)
 
 --Ej15
-sumaRacionales :: Integer ->Integer ->Float
+sumaRacionales :: Integer -> Integer -> Float
 sumaRacionales n m | n <= 0 || m <= 0 = error "deben ser naturales"
 sumaRacionales 1 m = 1 / fromInteger m
 sumaRacionales n m = sumaDivision n m + sumaRacionales (n-1) m
@@ -173,6 +173,7 @@ sumaDivision p q = fromInteger p / fromInteger q + sumaDivision p (q-1)
 
 
 --Ej16
+-- a
 menorDivisor :: Integer -> Integer
 menorDivisor n = menorDivisorDesde n 2
 
@@ -180,12 +181,31 @@ menorDivisorDesde :: Integer -> Integer -> Integer
 menorDivisorDesde n d | mod n d == 0 = d
                       | otherwise  = menorDivisorDesde n (d + 1)
 
+-- b 
+esPrimo :: Integer -> Bool 
+esPrimo n | menorDivisor n == n = True 
+          | otherwise = False
 
+-- c
+sonCoprimos :: Integer -> Integer -> Bool
+sonCoprimos n m = sonCoprimos' n m 2
 
+sonCoprimos' :: Integer -> Integer -> Integer -> Bool
+sonCoprimos' n m p | p == m || p == n = True
+                   | mod n p == 0 && mod m p == 0 = False
+                   | otherwise = sonCoprimos' n m (p + 1)
 
+-- d
+nEsimoPrimo :: Integer -> Integer
+nEsimoPrimo n = esPrimoNVeces 2 n
 
+esPrimoNVeces :: Integer -> Integer -> Integer
+esPrimoNVeces n 1 = n
+esPrimoNVeces n veces = esPrimoNVeces (proxPrimo n) (veces - 1)
 
- 
+proxPrimo :: Integer -> Integer
+proxPrimo n | esPrimo (n + 1) == True = (n + 1)
+            | otherwise = proxPrimo (n + 1)
                         
 
             

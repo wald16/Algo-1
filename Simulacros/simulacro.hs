@@ -61,4 +61,5 @@ personaConMasAmigos [] = []
 personaConMasAmigos lista = head (iterarPersonas (personas lista) lista)
 
 
+
 -- [("ana", "pedro"), ("ana", "martin"), ("jose", "matias"), ("matias", "chango"), ("juan", "matias")]                                              
