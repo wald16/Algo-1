@@ -1,5 +1,14 @@
-from numpy import *
+from numpy import *  # noqa: F403
 from queue import LifoQueue as Pila
+from queue import Queue as Cola
+
+
+def maximo(lista: list) -> int:
+    max = lista[0]
+    for elem in lista:
+        if max < elem:
+            max = elem
+    return max
 
 
 # EJ 1
@@ -117,17 +126,28 @@ def promedio_estudiante(archivo: str, lu: str) -> float:
 # EJ 8
 
 
-def flush_pila(pila: Pila) -> list:
+def pila_a_lista(pila: Pila) -> list:
     res = []
     while not pila.empty():
         res.append(pila.get())
+    for i in res[::-1]:
+        pila.put(i)
+    return res
+
+
+def cola_a_lista(cola: Cola) -> list:
+    res = []
+    while not cola.empty():
+        res.append(cola.get())
+    for i in res:
+        cola.put(i)
     return res
 
 
 def generar_nros_al_azar(cantidad: int, desde: int, hasta: int) -> Pila[int]:
     pila_nums = Pila()
     for i in range(cantidad):
-        num = random.randint(desde, hasta)
+        num = random.randint(desde, hasta)  # noqa: F405
         pila_nums.put(num)
     return pila_nums
 
@@ -142,25 +162,220 @@ def cantidad_elementos(p: Pila[int]) -> int:
     while not pila2.empty():
         p.put(pila2.get())
 
-    return flush_pila(p)
+    return pila_a_lista(p)
 
 
 # EJ 10
 def buscar_el_maximo(p: Pila[int]) -> int:
-    pila2 = Pila()
+    elementos = []
     while not p.empty():
-        pila2.put(p.get())
+        elemento = p.get()
+        elementos.append(elemento)
+    maxi = maximo(elementos)
+    for elem in elementos:
+        p.put(elem)
+    return maxi
 
-    maximo = pila2.get()
-    while not pila2.empty():
-        num = pila2.get()
-        if maximo < num:
-            maximo = num
 
-    while not pila2.empty():
-        p.put(pila2.get())
+# EJ 11
+def esta_bien_balanceada(s: str) -> bool:
+    parentesis = []
+    for char in s:
+        if char == "(":
+            parentesis.append(char)
+        elif char == ")":
+            if not parentesis:
+                return False
+            else:
+                parentesis.pop()
+    return True
 
-    return maximo
+
+# EJ 12
+def evaluar_expresion(s: str) -> float:
+    p = Pila()
+    for elem in s.split():
+        if elem not in "+-*/":
+            p.put(float(elem))
+        else:
+            oper2 = p.get()
+            oper1 = p.get()
+            if elem == "+":
+                result = oper1 + oper2
+            elif elem == "-":
+                result = oper1 - oper2
+            elif elem == "*":
+                result = oper1 * oper2
+            elif elem == "/":
+                result = oper1 / oper2
+            p.put(result)
+    return pila_a_lista(p)
+
+
+# EJ 13
+def generar_nros_al_azar2(cantidad: int, desde: int, hasta: int) -> Cola[int]:
+    c = Cola()
+    for i in range(cantidad):
+        num = random.randint(desde, hasta)  # noqa: F405
+        c.put(num)
+    return pila_a_lista(c)
+
+
+# EJ 14
+def cantidad_elementos2(c: Cola) -> int:
+    lista = []
+    res = 0
+    while not c.empty():
+        lista.append(c.get())
+        res += 1
+    for i in lista:
+        c.put(i)
+    return res
+
+
+# EJ 15
+def buscar_el_maximo2(c: Cola[int]) -> int:
+    elementos: list = []
+    while not c.empty():
+        elemento = c.get()
+        elementos.append(elemento)
+    maxi = maximo(elementos)
+    for elem in elementos:
+        c.put(elem)
+    return maxi
+
+
+# EJ 16
+def armar_secuencia_de_bingo() -> Cola[int]:
+    cola: Cola[int] = Cola()
+    while cantidad_elementos2(cola) < 100:
+        num: int = random.randint(0, 100)  # noqa: F405
+        if num not in cola_a_lista(cola):
+            cola.put(num)
+    return cola
+
+
+def jugar_carton_de_bingo(carton: list[int], bolillero: Cola[int]) -> int:
+    numsllenos: int = 0
+    cantjugadas: int = 0
+    while numsllenos < 12:
+        numobtenido = bolillero.get()
+        if numobtenido in carton:
+            numsllenos += 1
+        cantjugadas += 1
+    return cantjugadas
+
+
+# EJ 17
+def n_parcientes_urgentes(c: Cola[(int, str, str)]) -> str:
+    lista: list = cola_a_lista(c)
+    res: int = 0
+    for num, _, _ in lista:
+        if "1" in str(num) or "2" in str(num) or "3" in str(num):
+            res += 1
+    return res
+
+
+# EJ 18
+def atencion_a_clientes(
+    c: Cola[(str, int, bool, bool)],
+) -> Cola[(str, int, bool, bool)]:
+    prio: list[(str, int, bool, bool)] = []
+    prefer: list[(str, int, bool, bool)] = []
+    demas: list[(str, int, bool, bool)] = []
+    res: Cola[(str, int, bool, bool)] = Cola()
+    lista: list[(str, int, bool, bool)] = cola_a_lista(c)
+    for nom, dni, pref, prioridad in lista:
+        if prioridad:
+            prio.append((nom, dni, pref, prioridad))
+        elif pref:
+            prefer.append((nom, dni, pref, prioridad))
+        else:
+            demas.append((nom, dni, pref, prioridad))
+    res.put(prio)
+    res.put(prefer)
+    res.put(demas)
+    return res
+
+
+# --------------------------------------------------------------------------------
+# EJ 19
+
+
+def contar(lista: list[int], num: int) -> int:
+    res: int = 0
+    for elem in lista:
+        if elem == num:
+            res += 1
+    return res
+
+
+def agrupar_por_longitud(nombre: str) -> dict:
+    tuple_list: list[(int, int)] = []
+    list_longitudes: list[int] = []
+    with open(nombre, "r") as f:
+        palabra: str = ""
+        letra = f.read(1)
+
+        while letra:
+            if letra != " " and letra != "\n":
+                palabra += letra
+            else:
+                if palabra:
+                    list_longitudes.append(len(palabra))
+                    palabra = ""
+            letra = f.read(1)
+    list_longitudes.append(len(palabra))
+    for i in list_longitudes:
+        tuple_list.append((i, contar(list_longitudes, i)))
+    return dict(tuple_list)
+
+
+# EJ 20
+def calcular_promedio_por_estudiante2(nombre: str) -> dict[str, float]:
+    lista: list[(str, float)] = []
+    numero: str = ""
+    with open(nombre, "r") as f:
+        lines = f.readlines()
+        for line in lines:
+            for char in line:
+                if char == ",":
+                    lista.append((numero, promedio_estudiante(nombre, numero)))
+                    numero = ""
+                    break
+                numero += char
+
+    return dict(lista)
+
+
+# EJ 21
+def la_palabra_mas_frecuente(nombre: str) -> str:
+    dic: dict = {}
+    with open(nombre, "r") as f:
+        palabra: str = ""
+        for letra in f.read():
+            if letra != " " and letra != "\n":
+                palabra += letra
+            else:
+                if palabra:
+                    if palabra in dic:
+                        dic[palabra] += 1
+                    else:
+                        dic[palabra] = 1
+                    palabra = ""
+        if palabra:
+            if palabra in dic:
+                dic[palabra] += 1
+            else:
+                dic[palabra] = 1
+    maximo: int = 0
+    res: str = ""
+    for key, value in dic.items():
+        if maximo < value:
+            maximo = value
+            res = key
+
+    return res
 
 
 nombre = "file"
@@ -176,7 +391,27 @@ pilaej = Pila()
 pilaej.put(10)
 pilaej.put(20)
 pilaej.put(30)
+colaej = Cola()
+colaej.put(10)
+colaej.put(20)
+colaej.put(30)
+formula = "10 * ( 1 + ( 2 * ( =1)))"
+expresion = "3 4 + 5 * 2 -"
+pacientes = Cola()
+pacientes.put((2, "j", "k"))
+pacientes.put((1, "a", "b"))
+pacientes.put((6, "f", "k"))
+carton: list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+bolillero = armar_secuencia_de_bingo()
+clientes = Cola()
+clientes.put(("Manuel Wald", "4", True, False))
+clientes.put(("Manuel W", "3", False, True))
+clientes.put(("Manuel", "2", True, True))
+clientes.put(("Man", "1", False, False))
+dic = "diccionario"
 
+
+# print(pila_a_lista(pilaej))
 # print(contar_lineas(nombre))
 # print(existe_palabra(palabra, nombre))
 # print(cantidad_apariciones(nombre, palabra))
@@ -187,7 +422,21 @@ pilaej.put(30)
 # print(listar_palabras_de_archivo(nombre))
 # print(promedio_estudiante(archivo_notas, lu))
 # print(calcular_promedio_por_estudiante(archivo_notas, archivo_promedios))
-# print(flush_pila(generar_nros_al_azar(cant, desde, hasta)))
+# print(pila_a_lista(generar_nros_al_azar(cant, desde, hasta)))
 # print(cantidad_elementos(save_random))
-# print(flush_pila(save_random))
-print(buscar_el_maximo(pilaej))
+# print(pila_a_lista(save_random))
+# print(buscar_el_maximo(pilaej))
+# print(esta_bien_balanceada(formula))
+# print(evaluar_expresion(expresion))
+# print(generar_nros_al_azar2(cant, desde, hasta))
+# print(cantidad_elementos2(colaej))
+# print(buscar_el_maximo2(colaej))
+# print(armar_secuencia_de_bingo())
+# print(carton)
+# print(cola_a_lista(bolillero))
+# print(jugar_carton_de_bingo(carton, bolillero))
+# print(n_parcientes_urgentes(pacientes))
+# print(atencion_a_clientes(clientes))
+# print(agrupar_por_longitud(dic))
+# print(calcular_promedio_por_estudiante2(archivo_notas))
+print(la_palabra_mas_frecuente(dic))
