@@ -378,6 +378,62 @@ def la_palabra_mas_frecuente(nombre: str) -> str:
     return res
 
 
+# EJ 22
+def visitar_sitio(historiales: dict[str, Pila[str]], usuario: str, sitio: str):
+    if usuario in historiales.keys():
+        historiales[usuario].put(sitio)
+    else:
+        pila: Pila[str] = Pila()
+        pila.put(sitio)
+        historiales[usuario] = pila
+    return historiales
+
+
+def navegar_atras(historiales: dict[str, Pila[str]], usuario: str):
+    pila: Pila = historiales[usuario]
+    actual: str = pila.get()
+    anterior: str = pila.get()
+    pila.put(actual)
+    pila.put(anterior)
+    historiales[usuario] = pila
+
+
+# EJ 23
+def agregar_producto(
+    inventario: dict[str, dict[int, int]], nombre: str, precio: float, cantidad: int
+):
+    producto: dict[float, int] = {"precio": precio, "cantidad": cantidad}
+    inventario[nombre] = producto
+
+
+def actualizar_stock(
+    inventario: dict[str, dict[float, int]], nombre: str, cantidad: int
+):
+    if nombre in inventario.keys():
+        datos: dict[float, int] = inventario[nombre]
+        datos["cantidad"] = cantidad
+        inventario[nombre] = datos
+
+
+def actualizar_precios(
+    inventario: dict[str, dict[float, int]], nombre: str, precio: float
+):
+    if nombre in inventario.keys():
+        datos: dict[float, int] = inventario[nombre]
+        datos["precio"] = precio
+        inventario[nombre] = datos
+
+
+def calcular_valor_inventario(inventario: dict[str, dict[float, int]]):
+    res: float = 0
+    for elem in inventario:
+        datos: dict[float, int] = inventario[elem]
+        precio = datos["precio"]
+        cant = datos["cantidad"]
+        res += precio * cant
+    return res
+
+
 nombre = "file"
 palabra = "nashe"
 archivo_notas = "archivo_notas.csv"
@@ -409,6 +465,11 @@ clientes.put(("Manuel W", "3", False, True))
 clientes.put(("Manuel", "2", True, True))
 clientes.put(("Man", "1", False, False))
 dic = "diccionario"
+historial = {}
+visitar_sitio(historial, "Usuario1", "google.com")
+visitar_sitio(historial, "Usuario1", "facebook.com")
+navegar_atras(historial, "Usuario1")
+visitar_sitio(historial, "Usuario2", "youtube.com")
 
 
 # print(pila_a_lista(pilaej))
@@ -439,4 +500,12 @@ dic = "diccionario"
 # print(atencion_a_clientes(clientes))
 # print(agrupar_por_longitud(dic))
 # print(calcular_promedio_por_estudiante2(archivo_notas))
-print(la_palabra_mas_frecuente(dic))
+# print(la_palabra_mas_frecuente(dic))
+# print(visitar_sitio(historial, "manu", "google"))
+# print(pila_a_lista(historial["Usuario1"]))
+inventario = {}
+agregar_producto(inventario, "Camisa", 20.0, 50)
+agregar_producto(inventario, "Pantal´on", 30.0, 30)
+actualizar_stock(inventario, "Camisa", 10)
+valor_total = calcular_valor_inventario(inventario)
+print("Valor total del inventario:", valor_total)  # Deber´ıa imprimir 1300.00
